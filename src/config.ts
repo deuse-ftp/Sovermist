@@ -1,5 +1,4 @@
 import { createPublicClient, http } from 'viem';
-
 // Definição da rede Monad Testnet
 export const monadTestnet = {
   id: 10143,
@@ -14,16 +13,13 @@ export const monadTestnet = {
   },
   testnet: true,
 };
-
 // Cliente público para viem (usado para reads e watches)
 export const publicClient = createPublicClient({
   chain: monadTestnet,
   transport: http(monadTestnet.rpcUrls.default.http[0]),
 });
-
 // Endereço do contrato (placeholder - substitua pelo real)
 export const contractAddress = '0xYourContractAddressHere';
-
 // ABI do contrato (placeholder - substitua pelo ABI real do seu contrato)
 export const contractABI = [
   // Exemplo de ABI - adicione o real aqui
@@ -58,9 +54,7 @@ export const contractABI = [
   },
   // Adicione mais funções/eventos conforme necessário
 ];
-
 // Endereço dev (placeholder - substitua pelo real)
 export const DEV_ADDRESS = '0xYourDevAddressHere';
-
 // URL do backend (placeholder - substitua pelo real)
 export const BACKEND_URL = 'https://backend-leaderboard.vercel.app';

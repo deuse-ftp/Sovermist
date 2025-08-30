@@ -95,7 +95,7 @@ function App() {
     try {
       const url = 'https://monad-games-id-site.vercel.app/api/check-wallet?wallet=' + walletAddress.toLowerCase();
       console.log('ℹ️ Fetching username for:', walletAddress);
-      const response = await fetch(url);
+      const response = await fetch(url, { mode: 'cors' });
       const data = await response.json();
       console.log('ℹ️ API response:', data);
       if (response.ok && data.hasUsername && data.user?.username) {
@@ -128,7 +128,7 @@ function App() {
   }, [authenticated]);
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch('https://backend-leaderboard.vercel.app/leaderboard');
+      const response = await fetch('https://backend-leaderboard.vercel.app/leaderboard', { mode: 'cors' });
       const data: { username: string; score: number }[] = await response.json();
       setLeaderboard(data.sort((a: { username: string; score: number }, b: { username: string; score: number }) => b.score - a.score));
       console.log('✅ Leaderboard atualizado do backend');
