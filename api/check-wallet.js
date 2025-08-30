@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 module.exports = async (req, res) => {
   const { wallet } = req.query;
   console.log('Received request to /api/check-wallet with wallet:', wallet);
@@ -8,13 +10,15 @@ module.exports = async (req, res) => {
   try {
     const response = await fetch(`https://monad-games-id-site.vercel.app/api/check-wallet?wallet=${wallet}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      timeout: 10000
     });
-    console.log('Monad API response status:', response.status, 'Body:', await response.text());
+    const text = await response.text();
+    console.log('Monad API response status:', response.status, 'Body:', text);
     if (!response.ok) {
-      throw new Error(`Monad API returned ${response.status}: ${await response.text()}`);
+      throw new Error(`Monad API returned ${response.status}: ${text}`);
     }
-    const data = await response.json();
+    const data = JSON.parse(text);
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(data);
   } catch (error) {
