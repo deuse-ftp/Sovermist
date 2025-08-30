@@ -8,6 +8,10 @@
     {
       "source": "/api/check-wallet(.*)",
       "destination": "/api/check-wallet.js"
+    },
+    {
+      "source": "/api/add-kill",
+      "destination": "/api/add-kill.js"
     }
   ]
 }
