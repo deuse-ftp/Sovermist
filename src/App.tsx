@@ -1,15 +1,15 @@
 import { useLogin, usePrivy, User, LinkedAccountWithMetadata } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
-// Declare global pro window.privyUser (pra TS não reclamar)
+
 declare global {
   interface Window {
     privyUser: User | undefined;
-    username: string; // Novo: Expor username pro Unity iframe
+    username: string;
   }
 }
+
 function App() {
   const { login } = useLogin({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onComplete: ({ user, loginMethod }: { user: User; isNewUser: boolean; wasAlreadyAuthenticated: boolean; loginMethod: string | null; loginAccount: LinkedAccountWithMetadata | null }) => {
       console.log('✅ User logged in:', user, 'Method:', loginMethod);
       window.dispatchEvent(new Event('walletConnected'));
@@ -24,6 +24,7 @@ function App() {
       }
     },
   });
+
   const { authenticated, ready, logout, user } = usePrivy();
   const [username, setUsername] = useState('');
   const [loadingUsername, setLoadingUsername] = useState(false);
@@ -32,7 +33,7 @@ function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  // Força fundo preto na tela toda
+
   useEffect(() => {
     document.body.style.backgroundColor = '#000 !important';
     document.body.style.margin = '0';
@@ -45,7 +46,7 @@ function App() {
     document.body.style.color = '#fff';
     document.body.style.fontFamily = 'Arial, sans-serif';
   }, []);
-  // Pega o endereço do embedded wallet diretamente
+
   useEffect(() => {
     if (authenticated && user && user.linkedAccounts.length > 0) {
       console.log('User object:', user);
@@ -61,14 +62,14 @@ function App() {
       }
     }
   }, [authenticated, user]);
-  // Novo: Expor username no window após fetch
+
   useEffect(() => {
     if (username && username !== 'Unknown') {
       window.username = username;
       console.log('✅ Username exposto no window:', window.username);
     }
   }, [username]);
-  // Novo: Listener para postMessage do iframe (Unity)
+
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === "request_username") {
@@ -79,6 +80,7 @@ function App() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+
   const fetchUsername = async (walletAddress: string) => {
     if (!walletAddress) {
       console.warn('❌ No wallet address provided for fetchUsername');
@@ -93,9 +95,9 @@ function App() {
     }
     setLoadingUsername(true);
     try {
-      const url = 'https://monad-games-id-site.vercel.app/api/check-wallet?wallet=' + walletAddress.toLowerCase();
+      const url = '/api/check-wallet?wallet=' + walletAddress.toLowerCase();
       console.log('ℹ️ Fetching username for:', walletAddress);
-      const response = await fetch(url, { mode: 'cors' });
+      const response = await fetch(url);
       const data = await response.json();
       console.log('ℹ️ API response:', data);
       if (response.ok && data.hasUsername && data.user?.username) {
@@ -118,17 +120,10 @@ function App() {
       setLoadingUsername(false);
     }
   };
-  // Poll o backend a cada 5s pra atualizar leaderboard
-  useEffect(() => {
-    if (authenticated) {
-      fetchLeaderboard();
-      const interval = setInterval(fetchLeaderboard, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [authenticated]);
+
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch('https://backend-leaderboard.vercel.app/leaderboard', { mode: 'cors' });
+      const response = await fetch('/api/leaderboard');
       const data: { username: string; score: number }[] = await response.json();
       setLeaderboard(data.sort((a: { username: string; score: number }, b: { username: string; score: number }) => b.score - a.score));
       console.log('✅ Leaderboard atualizado do backend');
@@ -136,8 +131,18 @@ function App() {
       console.error('❌ Erro ao fetch leaderboard:', error);
     }
   };
+
+  useEffect(() => {
+    if (authenticated) {
+      fetchLeaderboard();
+      const interval = setInterval(fetchLeaderboard, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [authenticated]);
+
   const pageCount = Math.ceil(leaderboard.length / itemsPerPage);
   const currentData = leaderboard.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div style={{ textAlign: 'center', maxWidth: '1280px', margin: '0 auto' }}>
       {!ready ? (
@@ -276,4 +281,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
