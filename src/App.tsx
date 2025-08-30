@@ -95,7 +95,7 @@ function App() {
     }
     setLoadingUsername(true);
     try {
-      const url = '/api/check-wallet?wallet=' + walletAddress.toLowerCase();
+      const url = `/api/check-wallet?wallet=${walletAddress.toLowerCase()}`;
       console.log('ℹ️ Fetching username for:', walletAddress);
       const response = await fetch(url);
       const data = await response.json();
@@ -209,7 +209,7 @@ function App() {
           <p>If the message ''Loading game for the first time'' appears, press F5 and please wait</p>
           <iframe
             frameBorder="0"
-            src="https://itch.io/embed-upload/14809571?color=333333"
+            src="https://itch.io/embed-upload/14810032?color=333333"
             allowFullScreen
             width="1280"
             height="760"
